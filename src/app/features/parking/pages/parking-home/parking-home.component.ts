@@ -5,7 +5,6 @@ import { FormBuilder } from '@angular/forms';
 import { ParkingRecord } from '../../interfaces/parking.interfaces';
 import { ParkingService } from '../../services/parking.service';
 
-
 @Component({
   selector: 'app-parking-home',
   standalone: true,
@@ -25,12 +24,26 @@ export class ParkingHomeComponent {
   readonly errorMessage = signal<string>('');
 
   readonly checkInForm = this.formBuilder.nonNullable.group({
-    vehicle_plate: ['', [Validators.required, Validators.minLength(5)]],
+    vehicle_plate: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(5),
+        Validators.maxLength(8)
+      ]
+    ],
     vehicle_type: ['carro', [Validators.required]]
   });
 
   readonly checkOutForm = this.formBuilder.nonNullable.group({
-    vehicle_plate: ['', [Validators.required, Validators.minLength(5)]]
+    vehicle_plate: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(5),
+        Validators.maxLength(8)
+      ]
+    ]
   });
 
   ngOnInit(): void {
@@ -38,7 +51,6 @@ export class ParkingHomeComponent {
   }
 
   loadActiveRecords(): void {
-
     this.isLoading.set(true);
     this.clearMessages();
 
@@ -67,13 +79,17 @@ export class ParkingHomeComponent {
     this.isLoading.set(true);
 
     const payload = {
-      vehicle_plate: this.normalizePlate(this.checkInForm.controls.vehicle_plate.value),
+      vehicle_plate: this.normalizePlate(
+        this.checkInForm.controls.vehicle_plate.value
+      ),
       vehicle_type: this.checkInForm.controls.vehicle_type.value
     };
 
     this._parkingService.checkIn(payload).subscribe({
       next: (response) => {
-        this.successMessage.set(response.message ?? 'Ingreso registrado correctamente.');
+        this.successMessage.set(
+          response.message ?? 'Ingreso registrado correctamente.'
+        );
         this.checkInForm.reset({
           vehicle_plate: '',
           vehicle_type: 'carro'
@@ -90,7 +106,6 @@ export class ParkingHomeComponent {
   }
 
   registerCheckOut(): void {
-
     this.clearMessages();
 
     if (this.checkOutForm.invalid) {
@@ -101,12 +116,16 @@ export class ParkingHomeComponent {
     this.isLoading.set(true);
 
     const payload = {
-      vehicle_plate: this.normalizePlate(this.checkOutForm.controls.vehicle_plate.value)
+      vehicle_plate: this.normalizePlate(
+        this.checkOutForm.controls.vehicle_plate.value
+      )
     };
 
     this._parkingService.checkOut(payload).subscribe({
       next: (response) => {
-        this.successMessage.set(response.message ?? 'Salida registrada correctamente.');
+        this.successMessage.set(
+          response.message ?? 'Salida registrada correctamente.'
+        );
         this.checkOutForm.reset({
           vehicle_plate: ''
         });
